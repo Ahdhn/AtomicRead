@@ -9,6 +9,8 @@
 
 #include "gtest/gtest.h"
 
+int size = 1024;
+
 __global__ void addZeroKernel(int* d_in, int* d_out, int size)
 {
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
@@ -31,8 +33,7 @@ TEST(Test, addZero)
 {
     const int block_size = 256;
 
-    int val  = 55;
-    int size = 1024;
+    int val = 55;
 
     thrust::host_vector<int> h_vec(1, val);
 
@@ -55,8 +56,7 @@ TEST(Test, noCache)
 {
     const int block_size = 256;
 
-    int val  = 55;
-    int size = 1024;
+    int val = 55;
 
     thrust::host_vector<int> h_vec(1, val);
 
@@ -78,7 +78,14 @@ TEST(Test, noCache)
 
 int main(int argc, char** argv)
 {
+
     ::testing::InitGoogleTest(&argc, argv);
+
+    if (argc == 2) {
+        size = std::atoi(argv[1]);
+    }
+
+    std::cout << "\n Size = " << size << "\n";
 
     return RUN_ALL_TESTS();
 }
