@@ -2,6 +2,8 @@
 #include <cuda_runtime.h>
 #include <stdio.h>
 
+#include <cuda_profiler_api.h>
+
 #include <thrust/device_vector.h>
 #include <thrust/host_vector.h>
 
@@ -40,10 +42,15 @@ TEST(Test, addZero)
     thrust::device_vector<int> d_in(1, val);
     thrust::device_vector<int> d_out(size);
 
+    CUDA_ERROR(cudaProfilerStart());
+
     addZeroKernel<<<DIVIDE_UP(size, block_size), block_size>>>(
         d_in.data().get(), d_out.data().get(), size);
 
     auto err = cudaDeviceSynchronize();
+    
+    CUDA_ERROR(cudaProfilerStop());
+
     EXPECT_EQ(err, cudaSuccess);
 
     h_vec = d_out;
@@ -63,11 +70,15 @@ TEST(Test, noCache)
     thrust::device_vector<int> d_in(1, val);
     thrust::device_vector<int> d_out(size);
 
+    CUDA_ERROR(cudaProfilerStart());
 
     noCacheKernel<<<DIVIDE_UP(size, block_size), block_size>>>(
         d_in.data().get(), d_out.data().get(), size);
 
     auto err = cudaDeviceSynchronize();
+
+    CUDA_ERROR(cudaProfilerStop());
+
     EXPECT_EQ(err, cudaSuccess);
 
     h_vec = d_out;
